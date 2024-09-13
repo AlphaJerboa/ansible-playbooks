@@ -1,0 +1,11 @@
+---
+
+- name: Install APT packages
+  become: true
+  ansible.builtin.apt:
+    name: "{{ item.name | default(item) }}"
+    state: "{{ item.state | default('present') }}"
+    autoremove: true
+    purge: true
+  loop: "{{ apt_packages }}"
+  register: apt_packages_installed

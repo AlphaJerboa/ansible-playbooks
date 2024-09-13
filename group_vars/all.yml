@@ -1,0 +1,8 @@
+ansible_connection: ssh
+ansible_user: root
+remote_user: root
+user: root
+ansible_command_timeout: 20
+# RequestTTY is required to avoid having module stuck during their execution
+ansible_ssh_common_args: '-o StrictHostKeyChecking=no -o RequestTTY=yes'
+

@@ -1,0 +1,6 @@
+---
+
+- name: set Paris timezone
+  ansible.builtin.shell:
+    cmd: timedatectl set-timezone Europe/Paris
+  become: true

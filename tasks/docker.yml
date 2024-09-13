@@ -1,0 +1,22 @@
+---
+
+- name: Install docker packages
+  ansible.builtin.apt:
+    name:
+    - docker-ce
+    - docker-ce-cli
+    - containerd.io
+    - docker-buildx-plugin
+    - docker-compose-plugin
+    state: present
+  become: true
+
+- name: Enable docker daemon
+  ansible.builtin.service:
+    name: docker
+    state: started
+    enabled: true
+    daemon-reload: true
+  become: true
+
+

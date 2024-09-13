@@ -1,0 +1,81 @@
+---
+# To run it use: ansible-playbook -i inventory/ --vault-id .vault_pass -l cicd tailscale.yml
+- hosts: "all"
+  name: Tasks list to execute
+  gather_facts: yes
+  tasks:
+  - ansible.builtin.import_tasks: tasks/load_vars.yml
+    tags:
+    - all
+    - common
+  - ansible.builtin.import_tasks: tasks/timezone.yml
+    tags:
+    - timezone
+    - all
+  - ansible.builtin.import_tasks: tasks/locale.yml
+    tags:
+    - all
+    - locale
+  - ansible.builtin.import_tasks: tasks/disable_ipv6.yml
+    tags:
+    - all
+    - ipv6
+  - ansible.builtin.import_tasks: tasks/apt_packages.yml
+    tags:
+    - all
+    - packages
+  - ansible.builtin.import_tasks: tasks/apt_repos.yml
+    tags:
+    - all
+    - repos
+    - docker
+    - tailscale
+    - wazuh
+  - ansible.builtin.import_tasks: tasks/openssh.yml
+    tags:
+    - all
+    - openssh
+  - ansible.builtin.import_tasks: tasks/tailscale.yml
+    tags:
+    - all
+    - tailscale
+  - ansible.builtin.import_tasks: tasks/docker.yml
+    tags:
+    - all
+    - docker
+  - ansible.builtin.import_tasks: tasks/prometheus.yml
+    tags:
+    - all
+    - docker
+    - prometheus
+  - ansible.builtin.import_tasks: tasks/wazuh-agent.yml
+    tags:
+    - all
+    - wazuh
+
+  handlers:
+    - ansible.builtin.import_tasks: handlers/openssh.yml
+      tags:
+      - all
+      - common
+      - openssh
+    - ansible.builtin.import_tasks: handlers/wazuh-agent.yml
+      tags:
+      - all
+      - common
+      - wazuh
+    - ansible.builtin.import_tasks: handlers/tailscaled.yml
+      tags:
+      - all
+      - tailscale
+    - ansible.builtin.import_tasks: handlers/prometheus-node-exporter.yml
+      tags:
+      - all
+      - docker
+      - prometheus
+    - ansible.builtin.import_tasks: handlers/reload_sysctl.yml
+      tags:
+      - all
+      - common
+      - ipv6
+

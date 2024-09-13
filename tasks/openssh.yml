@@ -1,0 +1,28 @@
+---
+
+- name: Copy SSH files
+  ansible.builtin.copy:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    mode: '0600'
+  loop: "{{ openssh_files }}"
+  become: true
+
+- name: Tune list of principals
+  ansible.builtin.template:
+    src: "templates/{{ openssh_principals }}.j2"
+    dest: "{{ openssh_dir }}/{{ openssh_principals}}"
+    mode: '0600'
+  become: true
+  notify: Restart openssh
+
+- name: Set option in ssh configuration
+  ansible.builtin.lineinfile:
+    line: "{{ item }}"
+    path: /etc/ssh/sshd_config
+  loop:
+    - TrustedUserCAKeys "{{ openssh_dir }}/{{ openssh_user_ca }}"
+    - AuthorizedPrincipalsFile "{{ openssh_dir }}/{{ openssh_principals }}"
+  become: true
+  notify: Restart openssh
+

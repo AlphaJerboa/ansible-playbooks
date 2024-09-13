@@ -1,0 +1,4 @@
+[all:vars]
+ansible_connection=ssh
+ansible_user=root
+ansible_ssh_extra_args="-o ConnectTimeout=10s -o PubKeyAuthentication=yes"

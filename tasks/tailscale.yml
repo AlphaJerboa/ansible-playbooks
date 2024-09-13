@@ -1,0 +1,55 @@
+---
+
+- name: Install tailscale package
+  apt:
+    name:
+    - tailscale
+    state: present
+  become: true
+  notify: Restart tailscaled
+
+
+- name: Disable log sending to log.tailscale.io
+  lineinfile:
+    path: /etc/default/tailscaled
+    line: TS_NO_LOGS_NO_SUPPORT=true
+  become: true
+  notify: Restart tailscaled
+
+- name: Add entry to resolv headscale server in case of dns issue
+  lineinfile:
+    path: /etc/hosts
+    line: "x.x.x.x\theadscale.xxxxx.xx"
+  become: true
+
+- name: Check if custom systemd configuration exist for tailscaled
+  ansible.builtin.stat:
+    path: /etc/systemd/system/tailscaled.service
+  register: tailscaled
+
+- name: Check tailscale status
+  ansible.builtin.shell: timeout 2s tailscale ip
+  register: tailscale_ip
+  ignore_errors: true
+
+- name: generate auth key on headscale server
+  delegate_to: 127.0.0.1
+  ansible.builtin.shell: ssh {{ headscale_fqdn }} {{ headscale_script }}
+  register: authkey
+  when: tailscale_ip.rc != 0
+
+
+- name: Register tailscale client
+  ansible.builtin.shell: timeout 20s tailscale up --login-server {{ headscale_url }} --accept-dns --auth-key {{ authkey.stdout }}
+  when: authkey.stdout is defined 
+  register: register
+  become: true
+
+- name: Check tailscale status
+  ansible.builtin.shell: timeout 2s tailscale ip
+  register: tailscale_ip
+
+- name: Display tailscale ip
+  ansible.builtin.debug:
+    msg: "{{ tailscale_ip.stdout }}"
+  

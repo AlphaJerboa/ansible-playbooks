@@ -1,0 +1,9 @@
+---
+
+- name: Monitor docker volumes
+  ansible.builtin.lineinfile:
+    path: /etc/default/prometheus-node-exporter
+    line: ARGS="--collector.filesystem.ignored-mount-points='^/(dev|proc|run|sys|mnt|media)($|/)'"
+    regexp: ^ARGS=
+  notify: Restart prometheus-node-exporter
+  become: true

@@ -1,0 +1,6 @@
+---
+
+- name: Set FR locale
+  ansible.builtin.shell:
+    cmd: localectl set-locale LANG=fr_FR.UTF-8
+  become: true

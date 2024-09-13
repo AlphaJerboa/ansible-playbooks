@@ -1,0 +1,14 @@
+---
+- name: Check OS distribution and version
+  fail:
+    msg: "OS {{ ansible_distribution }} {{ ansible_distribution_major_version }} not supported"
+  when: not (ansible_distribution == "Ubuntu" and ansible_distribution_major_version|int >= 20) and not (ansible_distribution == "Debian" and ansible_distribution_major_version|int >= 11)
+
+- name: Load vars based on OS
+  ansible.builtin.include_vars: "{{ item }}"
+  loop:
+  - "all.yml"
+  - "{{ ansible_distribution | lower }}.yml"
+  - "{{ ansible_distribution | lower }}-{{ ansible_distribution_major_version | int }}.yml"
+
+...

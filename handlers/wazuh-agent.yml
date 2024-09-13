@@ -1,0 +1,12 @@
+---
+
+- name: Enable wazuh-agent daemon
+  service:
+    name: wazuh-agent
+    state: started
+    enabled: true
+    daemon-reload: true
+- name: Restart wazuh-agent daemon
+  service:
+    name: wazuh-agent
+    state: restarted

@@ -1,0 +1,21 @@
+# Wazuh
+wazuh_agent_config_dir: /var/ossec
+wazuh_agent_config_enrollment_pass_file: /var/ossec/etc/authd.pass
+
+gpg_target_folder: '/usr/share/keyrings/'
+
+apt_repos:
+  - name: 'docker'
+    gpg_key_url: 'https://download.docker.com/linux/ubuntu/gpg'
+    gpg_target_filename: 'docker.gpg'
+    apt_entry: 'deb [arch=amd64 signed-by={{ gpg_target_folder }}/docker.gpg] https://download.docker.com/linux/ubuntu/ {{ ansible_distribution_release }}  stable'
+
+  - name: 'wazuh'
+    gpg_key_url: 'https://packages.wazuh.com/key/GPG-KEY-WAZUH'
+    gpg_target_filename: 'wazuh.gpg'
+    apt_entry: 'deb [signed-by={{ gpg_target_folder}}/wazuh.gpg] https://packages.wazuh.com/4.x/apt/ stable main'
+
+  - name: 'tailscale'
+    gpg_key_url: 'https://pkgs.tailscale.com/stable/ubuntu/{{ ansible_distribution_release }}.noarmor.gpg'
+    gpg_target_filename: 'tailscale-archive-keyring.gpg'
+    apt_entry: 'deb [signed-by={{ gpg_target_folder }}/tailscale-archive-keyring.gpg] https://pkgs.tailscale.com/stable/ubuntu {{ ansible_distribution_release }} main'

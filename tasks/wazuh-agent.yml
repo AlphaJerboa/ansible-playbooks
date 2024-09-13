@@ -1,0 +1,35 @@
+---
+
+- name: Install wazuh package
+  apt:
+    name:
+    - wazuh-agent
+    state: present
+  environment:
+    WAZUH_REGISTRATION_KEY: "{{ wazuh_agent_config_reg_key }}"
+    WAZUH_MANAGER: "{{ wazuh_agent_config_manager_ip }}"
+    WAZUH_AGENT_GROUP: "{{ wazuh_agent_config_groups }}" 
+  register: wazuh_agent_package_install
+  tags: install
+
+- name: Create Wazuh enrollment password file
+  copy:
+    dest: "{{ wazuh_agent_config_enrollment_pass_file }}"
+    content: "{{ wazuh_agent_config_reg_key }}"
+    mode: 0640
+    group: wazuh
+  tags: install
+  notify: Enable wazuh-agent daemon
+
+- name: Update wazuh local internal options file
+  template:
+    src: templates/var-ossec-etc-local-internal-options.conf.j2
+    dest: "{{ wazuh_agent_config_dir }}/etc/local_internal_options.conf"
+    owner: root
+    group: wazuh
+    mode: 0640
+  when:
+    - wazuh_agent_package_install
+  tags: config
+  notify: Restart wazuh-agent daemon
+

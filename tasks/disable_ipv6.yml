@@ -1,0 +1,10 @@
+---
+
+- name: Copy sysctl files
+  ansible.builtin.copy:
+    src: "98-ipv6.conf"
+    dest: "/etc/sysctl.d/98-ipv6.conf"
+    mode: '0600'
+  become: true
+  notify: Reload sysctl
+

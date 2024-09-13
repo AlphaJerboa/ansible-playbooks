@@ -1,0 +1,36 @@
+---
+
+
+wazuh_agent_config_repo_name: 'wazuh'
+wazuh_agent_config_manager_ip: ""
+wazuh_agent_config_groups: "servers"
+wazuh_agent_config_reg_key: !vault |
+          $ANSIBLE_VAULT;1.1;AES256
+
+headscale_fqdn: "headscale.xxx.xxx"
+headscale_url: "https://{{ headscale_fqdn }}:8080"
+headscale_script: "/root/<bash_script_to_generate_auth_key_w_short_expiration>.sh"
+
+openssh_user_ca: "ca.pub"
+openssh_principals: "authorized_principals"
+openssh_dir: "/etc/ssh"
+openssh_files:
+  - src: "{{ openssh_user_ca }}"
+    dest: "{{ openssh_dir}}/{{ openssh_user_ca }}"
+
+
+apt_packages:
+  - name: qemu-guest-agent
+  - name: gnupg
+  - name: apt-transport-https
+  - name: ca-certificates
+  - name: curl
+  - name: vim
+  - name: htop
+  - name: sudo
+  - name: wget
+  - name: unzip
+  - name: net-tools
+  - name: python3
+  - name: dnsutils
+  - name: prometheus-node-exporter

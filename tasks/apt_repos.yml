@@ -1,0 +1,20 @@
+---
+
+- name: Download repository key
+  ansible.builtin.shell: |
+    set -e -o pipefail
+    test -s "{{ gpg_target_folder }}/{{ item.gpg_target_filename }}" || wget --timeout=2 -O- "{{ item.gpg_key_url }}" | gpg --dearmor > "{{ gpg_target_folder }}/{{ item.gpg_target_filename }}" 
+  loop: "{{ apt_repos }}"
+  args:
+    executable: "{{ bash_executable_path }}"
+  become: true
+
+- name: Add repository in apt source list
+  ansible.builtin.apt_repository:
+    repo: "{{ item.apt_entry }}"
+    state: present
+    update_cache: true
+    filename: "{{ item.name }}"
+  loop: "{{ apt_repos }}"
+  become: true
+
