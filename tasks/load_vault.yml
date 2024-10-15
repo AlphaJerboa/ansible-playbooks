@@ -1,0 +1,46 @@
+  - name: Sent Curl request to vault
+    ansible.builtin.uri:
+      url: '{{ openbao_url }}/v1/auth/userpass/login/{{ openbao_username }}'
+      method: 'POST'
+      body: '{"password": "{{ openbao_password }}"}'
+      body_format: json
+      return_content: yes
+      timeout: 10
+    register: login_output
+    delegate_to: 127.0.0.1
+
+  - name: Display curl output
+    ansible.builtin.debug:
+      msg:
+        - 'Request sent to {{ openbao_url }}/v1/auth/userpass/login/{{ openbao_username }}'
+        - 'Token received: {{ login_output.json.auth.client_token }}'
+
+  - name: Load secrets
+    ansible.builtin.uri:
+      url: '{{ openbao_url }}/v1/{{ item.vault_path }}'
+      method: 'GET'
+      headers:
+        X-Vault-Request: true
+        X-Vault-Token: '{{ login_output.json.auth.client_token }}'
+      body_format: json
+      return_content: yes
+      timeout: 10
+    register: apicall_output
+    delegate_to: 127.0.0.1
+    loop: "{{ vault_secrets }}"
+
+  - name: Set fact for any secret
+    ansible.builtin.set_fact:
+      "{{ item.item.fact_name }}": "{{ item | json_query('json.data.data.' + item.item.value_name ) }}"
+    loop: '{{ apicall_output.results }}'
+
+  - name: Debug output
+    ansible.builtin.debug:
+      msg: '{{ item.fact_name }}={{ item.value_name }}'
+    loop: '{{ vault_secrets }}'
+
+#  - name: Debug output
+#    ansible.builtin.debug:
+#      msg:
+#        - "{{ item | json_query('json.data.data.' + item.item.value_name ) }}"
+#    loop: '{{ apicall_output.results }}'
