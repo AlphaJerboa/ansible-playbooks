@@ -1,4 +1,4 @@
----
+q---
 # To run it use: ansible-playbook -i inventory/ --vault-id .vault_pass -l cicd tailscale.yml
 - hosts: "all"
   name: Tasks list to execute
@@ -8,6 +8,11 @@
     tags:
     - all
     - common
+  - ansible.builtin.import_tasks: tasks/load_vault.yml
+    tags:
+    - all
+    - wazuh
+    - vault
   - ansible.builtin.import_tasks: tasks/timezone.yml
     tags:
     - timezone
